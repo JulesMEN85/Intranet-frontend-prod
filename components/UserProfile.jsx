@@ -1,12 +1,37 @@
-import { useState } from "react";
-
+import { useState, useEffect } from "react";
+import useUserStore from '@/store/userStore';
+import Link from 'next/link'
+import { Button } from './ui/button';
+import { usePathname } from "next/navigation";
 const UserProfile = ({ user, onUpdateAvatar }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [avatar, setAvatar] = useState(user.avatar || "https://via.placeholder.com/40");
 
-  const toggleDropdown = () => {
+const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
+
+  function capitalizeWords(fullName) {
+    if (!fullName) return fullName;
+    fullName = fullName.split("@")[0];
+    fullName = fullName.replace(".", " ");
+    return fullName
+      .split(' ')                     
+      .map(word =>                   
+        word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() 
+      )
+      .join(' ');                    
+  }
+
+  const { userLevel, token } = useUserStore();
+const pathname = usePathname();
+  const userState = useUserStore();  
+  const deleteToken = () => {
+    userState.removeAll();
+    localStorage.clear();
+  };
+
+
 
   const uploadAvatar = async (file) => {
     const formData = new FormData();
@@ -55,7 +80,7 @@ const UserProfile = ({ user, onUpdateAvatar }) => {
           />
           <div className="w-full">
             <p className="text-sm font-medium text-gray-900 truncate max-w-full">
-              {user.name || user.email.split("@")[0] || "Utilisateur"}
+              { capitalizeWords(user.email) || user.name || user.email.split("@")[0] || "Utilisateur"}
             </p>
             <p className="text-sm text-gray-500 truncate max-w-full">{user.email}</p>
           </div>
@@ -86,10 +111,11 @@ const UserProfile = ({ user, onUpdateAvatar }) => {
                     clipRule="evenodd"
                   />
                 </svg>
-                Mon compte 
+                Mon compte
               </a>
             </li>
             <li className="border-t border-gray-200 mx-4"></li>
+            
             <li>
               <a
                 href="#"
@@ -134,8 +160,10 @@ const UserProfile = ({ user, onUpdateAvatar }) => {
             </li>
             <li className="border-t border-gray-200 mx-4"></li>
             <li>
-              <a
-                href="#"
+              <Link
+                href={token && userLevel ? "/" : "/connexion"}
+                passHref
+                onClick={token && userLevel ? () => deleteToken() : null}
                 className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               >
                 <svg
@@ -155,9 +183,10 @@ const UserProfile = ({ user, onUpdateAvatar }) => {
                     d="M16 12H4m12 0-4 4m4-4-4-4m3-4h2a3 3 0 0 1 3 3v10a3 3 0 0 1-3 3h-2"
                   />
                 </svg>
-                Sign out
-              </a>
+                {token && userLevel ? 'Déconnexion' : 'Connexion'}
+              </Link>
             </li>
+
           </ul>
         </div>
       )}
