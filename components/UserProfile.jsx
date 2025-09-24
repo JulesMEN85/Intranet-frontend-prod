@@ -11,20 +11,35 @@ const toggleDropdown = () => {
     setIsOpen(!isOpen);
   };
 
+  /**
+   * Reçoit une adresse mail en entrée et 
+   * en sort le nom prénom en format "Prénom Nom"
+   * @param {*} fullName 
+   * @returns 
+   */
   function capitalizeWords(fullName) {
+    //Si la chaine est vide, on ne renvoie rien
     if (!fullName) return fullName;
+    //On retire tout ce qu'il y a apres le @
     fullName = fullName.split("@")[0];
+    //On remplace le "." par un espace
     fullName = fullName.replace(".", " ");
+    //On renvoie le nom complet
     return fullName
+      //On sépare les mots autour de l'espace puis on les met dans un tableau
       .split(' ')                     
+      //Pour chaque mot du tableau,
+      //on prend la premiere lettre, la met en majuscule,
+      //on récupère tout ce qu'il y a après la majuscule qui lui sera en miniscule,
+      //on concatène le tout
       .map(word =>                   
         word.charAt(0).toUpperCase() + word.slice(1).toLowerCase() 
       )
+      //On rassocie le tableau dans la variable fullName
       .join(' ');                    
   }
 
   const { userLevel, token } = useUserStore();
-const pathname = usePathname();
   const userState = useUserStore();  
   const deleteToken = () => {
     userState.removeAll();
