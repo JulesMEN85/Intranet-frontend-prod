@@ -16,3 +16,4 @@ svc.on('uninstall', function() {
 });
 
 svc.uninstall();
+svc.uninstall();

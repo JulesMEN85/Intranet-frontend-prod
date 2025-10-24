@@ -12,6 +12,7 @@ import { Button } from "@/components/ui/button";
 import Progress from "@/components/ui/Progress";
 import AddPersonModal from "@/components/AddPersonModal";
 import EditModal from "@/components/EditModal";
+import { baseURL } from "@/utils/baseURL";
 
 const timeStringToMinutes = (timeString) => {
   if (!timeString) return 0;
@@ -36,8 +37,7 @@ const PersonnelTables = ({ selectedWeek }) => {
   // Charger les personnels de base
   const loadBasePersonnel = async () => {
     try {
-      const response = await fetch(`http://192.168.1.18:4000/api/planning/base-personnel`);
-      
+      const response = await fetch(`${baseURL}/api/planning/base-personnel`);
       // Vérification de la réponse HTTP
       if (!response.ok) {
         throw new Error(`Erreur HTTP : ${response.status}`);
@@ -60,7 +60,7 @@ const PersonnelTables = ({ selectedWeek }) => {
   const loadWeeklyPlanning = async (week) => {
     try {
       const response = await fetch(
-        `http://192.168.1.18:4000/api/planning/weekly-planning?startDate=${week}`
+        `${baseURL}/api/planning/weekly-planning?startDate=${week}`
       );
   
       // Vérification de la réponse HTTP
@@ -88,8 +88,7 @@ const handleAddPerson = async (newPerson) => {
     console.log("Données envoyées :", newPerson);
 
     // Vérifiez ici quelle route utiliser en fonction du contexte
-    const endpoint = "http://192.168.1.18:4000/api/planning/with-personnel";
-
+    const endpoint = `${baseURL}/api/planning/with-personnel`;
     const response = await fetch(endpoint, {
       method: "POST",
       headers: {
@@ -115,7 +114,7 @@ const handleAddPerson = async (newPerson) => {
   const handleSaveEditPerson = async (updatedPerson) => {
     try {
       const response = await fetch(
-        `http://192.168.1.18:4000/api/planning/base-personnel/${updatedPerson.id}/${selectedWeek}`, // Ajout de la semaine sélectionnée
+        `${baseURL}/api/planning/base-personnel/${updatedPerson.id}/${selectedWeek}`, // Ajout de la semaine sélectionnée
         {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
@@ -156,7 +155,7 @@ const handleAddPerson = async (newPerson) => {
   const handleDeletePerson = async (id, semaine) => {
     try {
         const response = await fetch(
-            `http://192.168.1.18:4000/api/planning/base-personnel/${id}/${semaine}`, // Ajout de la semaine dans l'URL
+            `${baseURL}/api/planning/base-personnel/${id}/${semaine}`, // Ajout de la semaine dans l'URL
             {
                 method: "DELETE",
             }

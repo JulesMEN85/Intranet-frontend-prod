@@ -1,5 +1,6 @@
 "use client";
 
+import { baseURL } from "@/utils/baseURL";
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
@@ -97,8 +98,9 @@ const PgbPgcCard = ({ selectedWeek }) => {
     if (!selectedWeek) return;
   
     try {
+
   
-      const response = await fetch(`http://192.168.1.18:4000/api/systemes/postes-personnel?selectedWeek=${selectedWeek}`);
+      const response = await fetch(`${baseURL}/api/systemes/postes-personnel?selectedWeek=${selectedWeek}`);
       if (!response.ok) throw new Error(`Erreur HTTP! Statut : ${response.status}`);
   
       const data = await response.json();
@@ -161,7 +163,7 @@ const PgbPgcCard = ({ selectedWeek }) => {
 
 
       const response = await fetch(
-        `http://192.168.1.18:4000/api/systemes/pgbpgc?startDate=${startDate}&endDate=${endDate}`
+        `${baseURL}/api/systemes/pgbpgc?startDate=${startDate}&endDate=${endDate}`
       );
       if (!response.ok) throw new Error(`Erreur HTTP! Statut : ${response.status}`);
 
@@ -247,7 +249,7 @@ const PgbPgcCard = ({ selectedWeek }) => {
                   {Object.entries(systemeCounts).map(([systeme, count], index) => (
                     <p key={index} className="text-lg font-semibold">
                         📌 Nombre de commandes {"\"" + systeme + "\""} :
-                        <span className="text-blue-600"> {count} </span>
+                      <span className="text-blue-600"> {count} </span>
                     </p>
                   ))}
                 </div>

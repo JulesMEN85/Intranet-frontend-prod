@@ -1,4 +1,5 @@
 "use client";
+import { baseURL } from "@/utils/baseURL";
 import { useEffect, useState } from "react";
 
 const ModalConfigPostes = ({ isOpen, onClose, uniquePostes, uniquePersonnel, onSave, selectedWeek }) => {
@@ -17,7 +18,7 @@ const ModalConfigPostes = ({ isOpen, onClose, uniquePostes, uniquePersonnel, onS
   // 🔹 2️⃣ Fonction pour récupérer les affectations par défaut depuis l'API
   const fetchDefaultAssignments = async () => {
     try {
-      const response = await fetch("http://192.168.1.18:4000/api/postes/default-assignments");
+      const response = await fetch(`${baseURL}/api/postes/default-assignments`);
       if (!response.ok) throw new Error("Erreur lors de la récupération des affectations par défaut.");
       const data = await response.json();
   
@@ -97,7 +98,7 @@ const ModalConfigPostes = ({ isOpen, onClose, uniquePostes, uniquePersonnel, onS
   
       // 🔹 Enregistrer les affectations assignées
       if (assignmentsToSave.length > 0) {
-        const response = await fetch("http://192.168.1.18:4000/api/postes/default-assignments", {
+        const response = await fetch(`${baseURL}/api/postes/default-assignments`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(assignmentsToSave),
@@ -112,7 +113,7 @@ const ModalConfigPostes = ({ isOpen, onClose, uniquePostes, uniquePersonnel, onS
   
       // 🔹 Supprimer les affectations désassignées
       if (assignmentsToDelete.length > 0) {
-        const deleteResponse = await fetch("http://192.168.1.18:4000/api/postes/default-assignments", {
+        const deleteResponse = await fetch(`${baseURL}/api/postes/default-assignments`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ poste_codes: assignmentsToDelete }),

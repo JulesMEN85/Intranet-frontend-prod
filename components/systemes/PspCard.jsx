@@ -1,5 +1,6 @@
 "use client";
 
+import { baseURL } from '@/utils/baseURL';
 import React, { useEffect, useState } from 'react';
 import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 
@@ -89,7 +90,7 @@ const PsppCard = ({ selectedWeek }) => {
   
     try {
       const response = await fetch(
-        `http://192.168.1.18:4000/api/systemes/postes-personnel?selectedWeek=${formattedWeek}`
+        `${baseURL}/api/systemes/postes-personnel?selectedWeek=${formattedWeek}`
       );
   
       if (!response.ok) {
@@ -118,7 +119,7 @@ const PsppCard = ({ selectedWeek }) => {
   const fetchData = async (startDate, endDate) => {
     try {
       const response = await fetch(
-        `http://192.168.1.18:4000/api/systemes/psp?startDate=${startDate}&endDate=${endDate}`
+        `${baseURL}/api/systemes/psp?startDate=${startDate}&endDate=${endDate}`
       );
       const data = await response.json();
       setPsppData(data);
@@ -174,6 +175,7 @@ const PsppCard = ({ selectedWeek }) => {
 
 // 1️⃣ Log pour suivre les changements de `selectedWeek`
 useEffect(() => {
+  console.log("🔄 selectedWeek a changé :", selectedWeek);
 }, [selectedWeek]);
 
 // 2️⃣ Vérification et récupération des postes du personnel au montage du composant
@@ -209,6 +211,7 @@ useEffect(() => {
     ? ((totalTempsInHours / maxTempsParSemaine) * 100).toFixed(1)
     : 0;
 
+  console.log("📊 Mise à jour de la progression :", progressPercentage);
   setProgress(progressPercentage);
 }, [totalTemps, maxTempsParSemaine]);  
 

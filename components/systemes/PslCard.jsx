@@ -1,3 +1,4 @@
+import { baseURL } from "@/utils/baseURL";
 import React, { useEffect, useState } from "react";
 import { PieChart, Pie, Cell, Tooltip } from "recharts";
 
@@ -92,18 +93,15 @@ const PslCard = ({ selectedWeek, maxTempsParSemaine, setMaxTempsParSemaine, tota
 
     const formattedWeek = formatSelectedWeek(selectedWeek);
 
-
     try {
-        const response = await fetch(`http://192.168.1.18:4000/api/systemes/postes-personnel?selectedWeek=${formattedWeek}`);
+        const response = await fetch(`${baseURL}/api/systemes/postes-personnel?selectedWeek=${formattedWeek}`);
         
-
 
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
 
         const data = await response.json();
-
 
         if (data.message === "AUCUNE ASSIGNATION") {
             console.warn("🚨 Aucune assignation trouvée pour cette semaine.");
@@ -113,7 +111,6 @@ const PslCard = ({ selectedWeek, maxTempsParSemaine, setMaxTempsParSemaine, tota
         }
 
         if (Array.isArray(data)) {
-
 
             // 🔍 Recherche de la personne affectée à "MO_MEN_FINIT06"
             const personne = data.find(item => item.poste_code === "MO_MEN_FINIT06");
@@ -135,10 +132,8 @@ const PslCard = ({ selectedWeek, maxTempsParSemaine, setMaxTempsParSemaine, tota
             };
 
 
-
             // 🔹 Conversion du total en heures et mise à jour de `maxTempsParSemaine`
             const totalSemaine = Object.values(heuresDisponibles).reduce((acc, val) => acc + val, 0) / 3600;
-
 
             setMaxTempsParSemaine(totalSemaine);
             setPostesPersonnel(data);
@@ -170,7 +165,7 @@ const PslCard = ({ selectedWeek, maxTempsParSemaine, setMaxTempsParSemaine, tota
 
 
         const response = await fetch(
-            `http://192.168.1.18:4000/api/systemes/psl?startDate=${startDate}&endDate=${endDate}`
+            `${baseURL}/api/systemes/psl?startDate=${startDate}&endDate=${endDate}`
         );
 
         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
@@ -187,14 +182,11 @@ const PslCard = ({ selectedWeek, maxTempsParSemaine, setMaxTempsParSemaine, tota
             return acc + (hours * 3600 + minutes * 60 + seconds);
         }, 0);
 
-
-
         setTotalTemps(totalInSeconds);
 
         // 🔹 Mise à jour du total de la semaine actuelle sans accumulation des semaines précédentes
         setTotalTempsCumule((prev) => {
             const newTotal = totalTemps + totalInSeconds; // Somme correcte des temps PSL + PSPP de la semaine
-
             return newTotal;
         });
 
@@ -217,7 +209,6 @@ useEffect(() => {
 
 // 🔹 Chargement des données PSL
 useEffect(() => {
-
     if (selectedWeek) {
         const { from, to } = getDateRangeFromWeek(selectedWeek);
         fetchData(from.toISOString().split("T")[0], to.toISOString().split("T")[0]);
@@ -226,7 +217,6 @@ useEffect(() => {
 
 // 🔹 Mise à jour de la progression en fonction du total cumulé
 useEffect(() => {
-
 
     if (!maxTempsParSemaine || maxTempsParSemaine <= 0) {
         console.warn("⚠️ maxTempsParSemaine est invalide, impossible de calculer la progression !");
@@ -310,8 +300,8 @@ useEffect(() => {
                   {Object.entries(typeCounts).map(([type, count], index) => (
                     <p key={index} className="text-lg font-semibold">
                         📌 Nombre de commandes {"\"" + type + "\""} :
-                        <span className="text-blue-600"> {count} </span>
-                    </p>                  
+                      <span className="text-blue-600"> {count} </span>
+                    </p>
                   ))}
                 </div>
               );
