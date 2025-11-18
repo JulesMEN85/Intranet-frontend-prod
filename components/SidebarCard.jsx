@@ -145,6 +145,12 @@ const SidebarCard = () => {
                     <Link href="/statscompta" className="text-slate-700 dark:text-slate-300 hover:underline">
                       Statistiques
                     </Link>
+                    <Link href="/remise" className="text-slate-700 dark:text-slate-300 hover:underline">
+                      Famille de remise
+                    </Link>
+                    <Link href="/remise-client" className="text-slate-700 dark:text-slate-300 hover:underline">
+                      Remise Client
+                    </Link>
                   </div>
                 </div>
               </div>

@@ -5,7 +5,7 @@ import SidebarCard from "@/components/SidebarCard";
 import TableQuantitePanneauAchat from "@/components/TableQuantitePanneauAchat";
 
 const QuantitePanneauAchatPage = () => {
-  const loading = useAuthGuard([1, 3]);
+  const loading = useAuthGuard([1, 4]);
 
   if (loading) {
     return <div className="flex items-center justify-center h-screen">Chargement...</div>;

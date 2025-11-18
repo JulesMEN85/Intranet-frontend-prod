@@ -3,11 +3,17 @@
 import React, { useState } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { Button } from "@/components/ui/button";
-import { FormControl, FormField, FormItem, FormLabel } from "@/components/ui/form";
+import {
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+} from "@/components/ui/form";
 import axios from "axios";
 import { baseURL } from "@/utils/baseURL";
 import { getDateWithFormatAPI } from "@/utils/formatNumber";
 import Alert from "@/components/Alert";
+import LoaderTable from "@/components/LoaderTable";
 
 const QuantitePanneauAchatTable = () => {
     const methods = useForm({
@@ -21,7 +27,7 @@ const QuantitePanneauAchatTable = () => {
     const [error, setError] = useState(null);
     const [success, setSuccess] = useState(null);
     const [justReset, setJustReset] = useState(false);
-
+    const [loading, setLoading] = useState(false);
     const fetchData = async (formData) => {
         if (justReset) {
             setJustReset(false);
@@ -29,12 +35,16 @@ const QuantitePanneauAchatTable = () => {
         }
         const { startDate, endDate } = formData;
         if (!startDate || !endDate) {
-            setError({ code: "INVALID_INPUT", message: "Veuillez sélectionner une date de début et une date de fin." });
+            setError({
+                code: "INVALID_INPUT",
+                message: "Veuillez sélectionner une date de début et une date de fin.",
+            });
             setSuccess(null);
             return;
         }
         setError(null);
         setSuccess(null);
+        setLoading(true); // Début du chargement
         try {
             const formattedStartDate = getDateWithFormatAPI(startDate);
             const formattedEndDate = getDateWithFormatAPI(endDate);
@@ -44,9 +54,11 @@ const QuantitePanneauAchatTable = () => {
         } catch (e) {
             setError({
                 code: e.response?.status || "ERROR",
-                message: e.response?.data?.error || "Une erreur s’est produite.",
+                message: e.response?.data?.error || "Une erreur s'est produite.",
             });
             setSuccess(null);
+        } finally {
+            setLoading(false); // Fin du chargement
         }
     };
 
@@ -71,15 +83,19 @@ const QuantitePanneauAchatTable = () => {
                 return;
             }
             const { startDate, endDate } = methods.getValues();
-            const dateLine = `"Date de debut";${startDate || ""}\n"Date de fin";${endDate || ""}\n`;
+            const dateLine = `"Date de debut";${startDate || ""}\n"Date de fin";${endDate || ""
+                }\n`;
             const header = Object.keys(data[0]).join(";") + "\n";
-            const rows = data.map(row => [row.code, row.description, row.quantite].join(";")).join("\n");
+            const rows = data
+                .map((row) => [row.code, row.description, row.quantite].join(";"))
+                .join("\n");
             const csvContent = dateLine + header + rows;
             const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
             const url = URL.createObjectURL(blob);
             const a = document.createElement("a");
             a.href = url;
-            const filename = `quantite_panneau_achat_${startDate?.replaceAll("-", "") || "xx"}_${endDate?.replaceAll("-", "") || "xx"}.csv`;
+            const filename = `quantite_panneau_achat_${startDate?.replaceAll("-", "") || "xx"
+                }_${endDate?.replaceAll("-", "") || "xx"}.csv`;
             a.download = filename;
             document.body.appendChild(a);
             a.click();
@@ -104,7 +120,11 @@ const QuantitePanneauAchatTable = () => {
                             <FormItem>
                                 <FormLabel className="text-white">Date de début</FormLabel>
                                 <FormControl>
-                                    <input type="date" {...field} className="border border-gray-300 rounded p-2 bg-white text-black" />
+                                    <input
+                                        type="date"
+                                        {...field}
+                                        className="border border-gray-300 rounded p-2 bg-white text-black"
+                                    />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -116,7 +136,11 @@ const QuantitePanneauAchatTable = () => {
                             <FormItem>
                                 <FormLabel className="text-white">Date de fin</FormLabel>
                                 <FormControl>
-                                    <input type="date" {...field} className="border border-gray-300 rounded p-2 bg-white text-black" />
+                                    <input
+                                        type="date"
+                                        {...field}
+                                        className="border border-gray-300 rounded p-2 bg-white text-black"
+                                    />
                                 </FormControl>
                             </FormItem>
                         )}
@@ -124,7 +148,12 @@ const QuantitePanneauAchatTable = () => {
                     <Button type="submit" className="h-10">
                         Rechercher
                     </Button>
-                    <Button variant="outline" type="button" onClick={resetFilters} className="h-10">
+                    <Button
+                        variant="outline"
+                        type="button"
+                        onClick={resetFilters}
+                        className="h-10"
+                    >
                         Réinitialiser
                     </Button>
                     <Button
@@ -140,18 +169,36 @@ const QuantitePanneauAchatTable = () => {
             <table className="min-w-full border-collapse border border-gray-200 bg-white">
                 <thead>
                     <tr className="bg-gray-100">
-                        <th className="px-4 py-2 border border-gray-300 text-center">Code</th>
-                        <th className="px-4 py-2 border border-gray-300 text-center">Description</th>
-                        <th className="px-4 py-2 border border-gray-300 text-center">Quantité</th>
+                        <th className="px-4 py-2 border border-gray-300 text-center">
+                            Code
+                        </th>
+                        <th className="px-4 py-2 border border-gray-300 text-center">
+                            Description
+                        </th>
+                        <th className="px-4 py-2 border border-gray-300 text-center">
+                            Quantité Panneaux
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
-                    {data.length > 0 ? (
+                    {loading ? (
+                        <tr>
+                            <td colSpan={3} className="text-center p-4 bg-white">
+                                <LoaderTable />
+                            </td>
+                        </tr>
+                    ) : data.length > 0 ? (
                         data.map((item, index) => (
                             <tr key={index}>
-                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">{item.code}</td>
-                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">{item.description}</td>
-                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">{item.quantite}</td>
+                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">
+                                    {item.code}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">
+                                    {item.description}
+                                </td>
+                                <td className="border border-gray-300 px-4 py-2 bg-white text-center hover:bg-gray-200">
+                                    {item.quantite}
+                                </td>
                             </tr>
                         ))
                     ) : (
